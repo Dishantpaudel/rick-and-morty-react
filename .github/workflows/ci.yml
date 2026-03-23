@@ -3,9 +3,9 @@ name: React CI Pipeline
 # This tells GitHub to run this workflow every time you push to the main branch
 on:
   push:
-    branches: [ "main", "master" ]
+    branches: [ "main", "master", "develop" ]
   pull_request:
-    branches: [ "main", "master" ]
+    branches: [ "main", "master" , "develop" ]
 
 jobs:
   build-and-test:
