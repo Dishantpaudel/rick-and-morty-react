@@ -5,7 +5,7 @@ import babel from '@rolldown/plugin-babel';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
-import { playwright } from '@vitest/browser-playwright'; // <-- Added proper import
+import { playwright } from '@vitest/browser-playwright'; // <-- This is the new import
 
 // Fix for __dirname in ESM
 const __filename = fileURLToPath(
@@ -40,7 +40,7 @@ export default defineConfig({
                     browser: {
                         enabled: true,
                         headless: true,
-                        provider: playwright(), // <-- Changed from string to function
+                        provider: playwright(),
                         instances: [{ browser: 'chromium' }]
                     }
                 }
