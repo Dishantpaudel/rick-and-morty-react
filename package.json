@@ -7,7 +7,7 @@
         "dev": "vite",
         "build": "vite build",
         "lint": "eslint .",
-        "test": "vitest run",
+        "test": "npx playwright install chromium && vitest",
         "format": "prettier --write \"src/**/*.{js,jsx,css}\"",
         "preview": "vite preview",
         "prepare": "husky",

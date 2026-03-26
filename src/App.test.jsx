@@ -8,6 +8,6 @@ describe('App Component', () => {
     // This looks for an <h1> tag on the screen
     const heading = screen.getByRole('heading', { level: 1 });
     // This checks if the text inside the <h1> is correct
-    expect(heading).toHaveTextContent('');
+      expect(heading).toHaveTextContent('Rick and Morty (React)');
   });
 });
