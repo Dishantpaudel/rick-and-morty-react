@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
-import './App.css';
+import CharacterCard from './components/CharacterCard';
+import './style.css'; // Ensure you have copied the professional CSS to this file
 
 function App() {
-  // We use state to store the characters we fetch from the API
+  // State for data, loading, and search query
   const [characters, setCharacters] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
 
-  // useEffect runs once when the component loads to fetch the data
+  // Fetch data from API on mount
   useEffect(() => {
     fetch('https://rickandmortyapi.com/api/character')
       .then((response) => response.json())
@@ -14,53 +16,65 @@ function App() {
         setCharacters(data.results);
         setLoading(false);
       })
-      .catch((error) => console.error('Error fetching data:', error));
+      .catch((error) => {
+        console.error('Error fetching Rick and Morty data:', error);
+        setLoading(false);
+      });
   }, []);
 
-  return (
-    <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>
-      <h1 style={{ textAlign: 'center' }}>Rick and Morty Wiki</h1>
+  // Filter characters based on search input
+  const filteredCharacters = characters.filter((char) =>
+    char.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-      {loading ? (
-        <p style={{ textAlign: 'center' }}>Loading characters...</p>
-      ) : (
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: '20px',
-          }}
-        >
-          {characters.map((char) => (
-            <div
-              key={char.id}
-              style={{
-                border: '1px solid #444',
-                borderRadius: '10px',
-                padding: '10px',
-                textAlign: 'center',
-                backgroundColor: '#222',
-                color: 'white',
-              }}
-            >
-              <img
-                src={char.image}
-                alt={char.name}
-                style={{ width: '100%', borderRadius: '8px' }}
-              />
-              <h3>{char.name}</h3>
-              <p>
-                {char.status === 'Alive'
-                  ? '🟢'
-                  : char.status === 'Dead'
-                    ? '🔴'
-                    : '⚪'}{' '}
-                {char.status} - {char.species}
-              </p>
+  return (
+    <div id="app">
+      {/* Header with Search Bar */}
+      <header className="search-container">
+        <h1>Rick and Morty (React)</h1>
+        <input
+          type="text"
+          placeholder="Search for a character..."
+          className="search-bar"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </header>
+
+      <main id="center">
+        {loading ? (
+          <div className="loading">
+            <div className="counter">Loading the Multiverse...</div>
+          </div>
+        ) : (
+          <>
+            {/* The Character Grid using our new component */}
+            <div className="character-grid">
+              {filteredCharacters.map((char) => (
+                <CharacterCard
+                  key={char.id}
+                  name={char.name}
+                  image={char.image}
+                  status={char.status}
+                  species={char.species}
+                  origin={char.origin.name}
+                />
+              ))}
             </div>
-          ))}
-        </div>
-      )}
+
+            {/* Empty State */}
+            {filteredCharacters.length === 0 && (
+              <div style={{ marginTop: '40px' }}>
+                <p>No characters found in this dimension.</p>
+              </div>
+            )}
+          </>
+        )}
+      </main>
+
+      <footer id="spacer">
+        <div className="ticks"></div>
+      </footer>
     </div>
   );
 }

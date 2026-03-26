@@ -7,10 +7,12 @@
         "dev": "vite",
         "build": "vite build",
         "lint": "eslint .",
-        "test": "vitest run",
+        "test": "npx playwright install chromium && vitest",
         "format": "prettier --write \"src/**/*.{js,jsx,css}\"",
         "preview": "vite preview",
-        "prepare": "husky"
+        "prepare": "husky",
+        "storybook": "storybook dev -p 6006",
+        "build-storybook": "storybook build"
     },
     "dependencies": {
         "react": "^19.2.4",
@@ -37,7 +39,19 @@
         "lint-staged": "^16.4.0",
         "prettier": "^3.8.1",
         "vite": "^8.0.1",
-        "vitest": "^4.1.0"
+        "vitest": "^4.1.0",
+        "storybook": "^10.3.3",
+        "@storybook/react-vite": "^10.3.3",
+        "@chromatic-com/storybook": "^5.1.1",
+        "@storybook/addon-vitest": "^10.3.3",
+        "@storybook/addon-a11y": "^10.3.3",
+        "@storybook/addon-docs": "^10.3.3",
+        "@storybook/addon-onboarding": "^10.3.3",
+        "prop-types": "^15.8.1",
+        "eslint-plugin-storybook": "^10.3.3",
+        "playwright": "^1.58.2",
+        "@vitest/browser-playwright": "^4.1.0",
+        "@vitest/coverage-v8": "^4.1.0"
     },
     "lint-staged": {
         "*.{js,jsx}": [
