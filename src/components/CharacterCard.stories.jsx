@@ -8,6 +8,7 @@ export default {
 
 export const RickSanchez = {
   args: {
+    id: 1,
     name: 'Rick Sanchez',
     image: 'https://rickandmortyapi.com/api/character/avatar/1.jpeg',
     status: 'Alive',
@@ -18,6 +19,7 @@ export const RickSanchez = {
 
 export const DeadMorty = {
   args: {
+    id: 2,
     name: 'Morty Smith',
     image: 'https://rickandmortyapi.com/api/character/avatar/2.jpeg',
     status: 'Dead',

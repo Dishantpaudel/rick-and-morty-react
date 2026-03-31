@@ -1,13 +1,51 @@
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import App from './App';
+import { fetchCharacterById, fetchCharacters } from './api/rickAndMorty';
+
+vi.mock('./api/rickAndMorty', () => ({
+  fetchCharacters: vi.fn(),
+  fetchCharacterById: vi.fn(),
+}));
 
 describe('App Component', () => {
-  it('renders the main heading', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    window.location.hash = '#/';
+
+    fetchCharacterById.mockResolvedValue({
+      id: 1,
+      name: 'Rick Sanchez',
+    });
+
+    fetchCharacters.mockResolvedValue({
+      info: { count: 1, pages: 1, next: null, prev: null },
+      results: [
+        {
+          id: 1,
+          name: 'Rick Sanchez',
+          image: 'https://rickandmortyapi.com/api/character/avatar/1.jpeg',
+          status: 'Alive',
+          species: 'Human',
+          origin: { name: 'Earth (C-137)' },
+        },
+      ],
+    });
+  });
+
+  it('renders heading and fetched character', async () => {
     render(<App />);
-    // This looks for an <h1> tag on the screen
-    const heading = screen.getByRole('heading', { level: 1 });
-    // This checks if the text inside the <h1> is correct
-      expect(heading).toHaveTextContent('Rick and Morty (React)');
+
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      'Rick and Morty Character Explorer'
+    );
+    expect(await screen.findByText('Rick Sanchez')).toBeInTheDocument();
+    expect(fetchCharacters).toHaveBeenCalledWith(
+      expect.objectContaining({
+        page: 1,
+        name: '',
+        status: '',
+      })
+    );
   });
 });

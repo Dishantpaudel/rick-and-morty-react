@@ -1,81 +1,124 @@
-import { useState, useEffect } from 'react';
-import CharacterCard from './components/CharacterCard';
-import './style.css'; // Ensure you have copied the professional CSS to this file
+import { useEffect, useMemo, useState } from 'react';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
+import AppFooter from './components/AppFooter';
+import Navbar from './components/Navbar';
+import AboutPage from './pages/AboutPage';
+import CharacterDetailsPage from './pages/CharacterDetailsPage';
+import HomePage from './pages/HomePage';
+import './style.css';
+
+function parseRoute(hashValue) {
+  const hash = hashValue?.replace(/^#/, '') || '/';
+
+  if (hash === '/' || hash === '') {
+    return { name: 'home' };
+  }
+
+  if (hash === '/about') {
+    return { name: 'about' };
+  }
+
+  const detailMatch = hash.match(/^\/character\/(\d+)$/);
+  if (detailMatch) {
+    return { name: 'character', id: detailMatch[1] };
+  }
+
+  return { name: 'not-found' };
+}
 
 function App() {
-  // State for data, loading, and search query
-  const [characters, setCharacters] = useState([]);
+  const [currentRoute, setCurrentRoute] = useState(() =>
+    parseRoute(window.location.hash || '#/')
+  );
   const [searchQuery, setSearchQuery] = useState('');
-  const [loading, setLoading] = useState(true);
 
-  // Fetch data from API on mount
   useEffect(() => {
-    fetch('https://rickandmortyapi.com/api/character')
-      .then((response) => response.json())
-      .then((data) => {
-        setCharacters(data.results);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error('Error fetching Rick and Morty data:', error);
-        setLoading(false);
-      });
+    const syncRoute = () => {
+      setCurrentRoute(parseRoute(window.location.hash || '#/'));
+    };
+
+    if (!window.location.hash) {
+      window.location.hash = '#/';
+    }
+
+    syncRoute();
+    window.addEventListener('hashchange', syncRoute);
+
+    return () => {
+      window.removeEventListener('hashchange', syncRoute);
+    };
   }, []);
 
-  // Filter characters based on search input
-  const filteredCharacters = characters.filter((char) =>
-    char.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const handleSearchChange = (value) => {
+    setSearchQuery(value);
+
+    if (currentRoute.name !== 'home') {
+      window.location.hash = '#/';
+    }
+  };
+
+  const pageMeta = useMemo(() => {
+    if (currentRoute.name === 'about') {
+      return {
+        title: 'Rick and Morty Portal | About',
+        description:
+          'Learn about the React edition of the Rick and Morty portal.',
+      };
+    }
+
+    if (currentRoute.name === 'character') {
+      return {
+        title: 'Rick and Morty Portal | Character Details',
+        description:
+          'Detailed profile page for a Rick and Morty character in React.',
+      };
+    }
+
+    if (currentRoute.name === 'not-found') {
+      return {
+        title: 'Rick and Morty Portal | Page Not Found',
+        description: 'The page you requested was not found in this portal.',
+      };
+    }
+
+    return {
+      title: 'Rick and Morty Portal | React Edition',
+      description:
+        'Explore the Rick and Morty multiverse. Search, filter, and browse characters with React.',
+    };
+  }, [currentRoute.name]);
 
   return (
-    <div id="app">
-      {/* Header with Search Bar */}
-      <header className="search-container">
-        <h1>Rick and Morty (React)</h1>
-        <input
-          type="text"
-          placeholder="Search for a character..."
-          className="search-bar"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-      </header>
+    <HelmetProvider>
+      <div className="app-shell">
+        <Helmet>
+          <title>{pageMeta.title}</title>
+          <meta name="description" content={pageMeta.description} />
+          <link rel="preconnect" href="https://rickandmortyapi.com" />
+        </Helmet>
 
-      <main id="center">
-        {loading ? (
-          <div className="loading">
-            <div className="counter">Loading the Multiverse...</div>
-          </div>
-        ) : (
-          <>
-            {/* The Character Grid using our new component */}
-            <div className="character-grid">
-              {filteredCharacters.map((char) => (
-                <CharacterCard
-                  key={char.id}
-                  name={char.name}
-                  image={char.image}
-                  status={char.status}
-                  species={char.species}
-                  origin={char.origin.name}
-                />
-              ))}
-            </div>
+        <Navbar searchQuery={searchQuery} onSearchChange={handleSearchChange} />
 
-            {/* Empty State */}
-            {filteredCharacters.length === 0 && (
-              <div style={{ marginTop: '40px' }}>
-                <p>No characters found in this dimension.</p>
-              </div>
-            )}
-          </>
+        {currentRoute.name === 'home' && <HomePage searchQuery={searchQuery} />}
+        {currentRoute.name === 'about' && <AboutPage />}
+        {currentRoute.name === 'character' && (
+          <CharacterDetailsPage characterId={currentRoute.id} />
         )}
-      </main>
+        {currentRoute.name === 'not-found' && (
+          <main className="page-main">
+            <section className="state-card glass-panel">
+              <h2 className="state-title">Page Not Found</h2>
+              <p>This portal page does not exist in the current timeline.</p>
+              <a href="#/" className="retry-button back-link">
+                Go Home
+              </a>
+            </section>
+          </main>
+        )}
 
-      <footer id="spacer">
-        <div className="ticks"></div>
-      </footer>
-    </div>
+        <AppFooter />
+      </div>
+    </HelmetProvider>
   );
 }
 
