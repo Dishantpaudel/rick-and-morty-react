@@ -1,14 +1,12 @@
-name: React CI Pipeline
+name: React CI and Vercel Deploy
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ "main", "master", "develop" ]
   pull_request:
-    branches: [ "main", "master" , "develop" ]
+    branches: ["main"]
 
 jobs:
-  build-and-test:
+  quality-checks:
     runs-on: ubuntu-latest
 
     steps:
@@ -18,26 +16,70 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Check Formatting
+      - name: Check formatting
         run: npm run format:check
 
-      - name: Run Linting
+      - name: Run linting
         run: npm run lint
 
-      - name: Run Unit Tests
+      - name: Run component tests
         run: npm run test:unit
 
-      - name: Install Playwright Browser
+      - name: Install Playwright browser
         run: npx playwright install --with-deps chromium
 
-      - name: Run End-to-End Tests
+      - name: Run E2E tests
         run: npm run test:e2e
 
-      - name: Build Application
+      - name: Build application
         run: npm run build
+
+  deploy-preview:
+    runs-on: ubuntu-latest
+    needs: quality-checks
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate Vercel secrets
+        run: |
+          test -n "${{ secrets.VERCEL_TOKEN }}" || (echo "Missing VERCEL_TOKEN secret" && exit 1)
+          test -n "${{ secrets.VERCEL_ORG_ID }}" || (echo "Missing VERCEL_ORG_ID secret" && exit 1)
+          test -n "${{ secrets.VERCEL_PROJECT_ID }}" || (echo "Missing VERCEL_PROJECT_ID secret" && exit 1)
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Pull Vercel preview environment
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Build Vercel artifacts
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Deploy preview to Vercel
+        run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
