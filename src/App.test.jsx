@@ -1,51 +1,61 @@
-import { render, screen } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import App from './App';
-import { fetchCharacterById, fetchCharacters } from './api/rickAndMorty';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
+import CharacterCard from './components/CharacterCard';
+import Navbar from './components/Navbar';
 
-vi.mock('./api/rickAndMorty', () => ({
-  fetchCharacters: vi.fn(),
-  fetchCharacterById: vi.fn(),
-}));
+describe('CharacterCard', () => {
+  it('renders card content and high-priority image attributes', () => {
+    render(
+      <CharacterCard
+        id={1}
+        name="Rick Sanchez"
+        image="https://rickandmortyapi.com/api/character/avatar/1.jpeg"
+        status="Alive"
+        species="Human"
+        origin="Earth (C-137)"
+        priority
+      />
+    );
 
-describe('App Component', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    window.location.hash = '#/';
-
-    fetchCharacterById.mockResolvedValue({
-      id: 1,
-      name: 'Rick Sanchez',
+    const link = screen.getByRole('link', {
+      name: 'Open details for Rick Sanchez',
     });
+    const image = screen.getByRole('img', { name: 'Rick Sanchez' });
 
-    fetchCharacters.mockResolvedValue({
-      info: { count: 1, pages: 1, next: null, prev: null },
-      results: [
-        {
-          id: 1,
-          name: 'Rick Sanchez',
-          image: 'https://rickandmortyapi.com/api/character/avatar/1.jpeg',
-          status: 'Alive',
-          species: 'Human',
-          origin: { name: 'Earth (C-137)' },
-        },
-      ],
-    });
+    expect(link).toHaveAttribute('href', '#/character/1');
+    expect(screen.getByText('Rick Sanchez')).toBeInTheDocument();
+    expect(screen.getByText('Alive')).toHaveClass('status-alive');
+    expect(image).toHaveAttribute('width', '300');
+    expect(image).toHaveAttribute('height', '300');
+    expect(image).toHaveAttribute('loading', 'eager');
+    expect(image).toHaveAttribute('fetchpriority', 'high');
   });
 
-  it('renders heading and fetched character', async () => {
-    render(<App />);
+  it('defaults to lazy loading when not prioritized', () => {
+    render(
+      <CharacterCard
+        id={2}
+        name="Morty Smith"
+        image="https://rickandmortyapi.com/api/character/avatar/2.jpeg"
+      />
+    );
 
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
-      'Rick and Morty Character Explorer'
-    );
-    expect(await screen.findByText('Rick Sanchez')).toBeInTheDocument();
-    expect(fetchCharacters).toHaveBeenCalledWith(
-      expect.objectContaining({
-        page: 1,
-        name: '',
-        status: '',
-      })
-    );
+    const image = screen.getByRole('img', { name: 'Morty Smith' });
+    expect(image).toHaveAttribute('loading', 'lazy');
+    expect(image).toHaveAttribute('fetchpriority', 'auto');
+  });
+});
+
+describe('Navbar', () => {
+  it('emits search value changes through callback', () => {
+    const onSearchChange = vi.fn();
+
+    render(<Navbar searchQuery="" onSearchChange={onSearchChange} />);
+
+    fireEvent.change(screen.getByLabelText('Search characters'), {
+      target: { value: 'Morty' },
+    });
+
+    expect(onSearchChange).toHaveBeenCalledWith('Morty');
   });
 });
