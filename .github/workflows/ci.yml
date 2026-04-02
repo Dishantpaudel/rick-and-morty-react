@@ -7,6 +7,8 @@ on:
 
 jobs:
   quality-checks:
+    # THIS IS THE FIX: This strictly matches your branch protection rule!
+    name: Lint, Format and Test
     runs-on: ubuntu-latest
 
     steps:
