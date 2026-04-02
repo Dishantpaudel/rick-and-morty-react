@@ -1,70 +1,61 @@
-# 🌌 Rick and Morty Portal (React Edition)
+# Rick and Morty Portal (React Edition)
 
-A professional character explorer built with **React 18** and **Vite**. This project demonstrates modern frontend workflows, including Component-Driven Development with Storybook, automated CI/CD pipelines, and high-performance rendering.
+A custom single-page character explorer built with React and Vite. This app fetches live data from the Rick and Morty API, supports search and status filtering, and includes route-level character details.
 
----
+## Live Website
+https://rick-and-morty-react-gray.vercel.app/
 
-## 🚀 Live Demo
-Experience the Multiverse here:
-👉 **[https://rick-and-morty-react-gray.vercel.app/](https://rick-and-morty-react-gray.vercel.app/)**
+## Screenshot
+![Rick and Morty Portal React screenshot](./docs/screenshots/app-preview.png)
 
----
+## Core Features
+- API integration with `https://rickandmortyapi.com/api/character`
+- User interactions for searching, filtering, pagination, and navigating to character details
+- Matching UI and behavior with the Vue version of the same app
+- Component stories with Storybook
+- Component tests with Vitest
+- End-to-end user flow tests with Playwright
 
-## 📸 Preview
-![App Screenshot](./docs/screenshots/app-preview.png)
+## Run Locally
+1. Install dependencies.
+2. Start the development server.
 
-*The interface features a custom "Neon Glassmorphism" design, responsive grid layout, and real-time character filtering.*
-
----
-
-## 🛠️ Tech Stack
-
-| Technology | Purpose |
-| :--- | :--- |
-| **React 18** | UI Library (Hooks & Functional Components) |
-| **Vite** | Lightning-fast Build Tool & Bundler |
-| **Storybook 8** | Component-Driven Development & Documentation |
-| **Vitest** | Unit Testing & Logic Validation |
-| **Playwright** | Browser-based Interaction Testing |
-| **Vercel** | Automated Cloud Deployment |
-
----
-
-## ✨ Key Features
-
-* **🔍 Dynamic Search:** Real-time character filtering using React `useState` and optimized logic.
-* **🧩 Component Isolation:** The `CharacterCard` is a standalone, reusable component built to scale.
-* **📱 Fully Responsive:** A CSS Grid architecture that flows perfectly from mobile to ultra-wide monitors.
-* **🎨 Professional UI:** Deep space aesthetic with accessibility-compliant neon accents.
-
----
-
-## 🧪 Development & Storybook
-
-We use **Storybook** to build and document our UI components in isolation. This ensures that every piece of the interface works correctly regardless of the API state.
-
-To launch the component library:
 ```bash
-npm run storybook
-📦 Available Scripts
-In the project directory, you can run:
+npm install
+npm run dev
+```
 
-🖥️ npm run dev
-Starts the local development server at http://localhost:5173. Includes Hot Module Replacement (HMR).
+The app runs at `http://localhost:5173` by default.
 
-🧪 npm run storybook
-Opens the Storybook dashboard (Port 6006) to view and test individual UI components.
+## Available Scripts
 
-🏗️ npm run build
-Compiles and optimizes the application for production. Output is located in the /dist folder.
+| Script | Purpose |
+| --- | --- |
+| `npm run dev` | Start the Vite development server. |
+| `npm run build` | Build production assets. |
+| `npm run preview` | Preview the production build locally. |
+| `npm run lint` | Run ESLint checks. |
+| `npm run format` | Format source files with Prettier. |
+| `npm run format:check` | Validate Prettier formatting without writing changes. |
+| `npm run test:unit` | Run component and unit tests with Vitest. |
+| `npm run test:e2e` | Run browser end-to-end tests with Playwright. |
+| `npm run storybook` | Start Storybook for component isolation. |
+| `npm run build-storybook` | Build static Storybook assets. |
 
-🕵️ npm run lint
-Analyzes the code for potential errors and enforces a clean, consistent coding style.
+## CI/CD
+GitHub Actions runs on each pull request to `main` and executes:
+- `format:check`
+- `lint`
+- `test:unit`
+- `test:e2e`
+- `build`
 
-🧪 npm run test
-Runs the test suite to verify that filtering logic and component rendering are bug-free.
+If all checks pass, the workflow deploys a preview build to Vercel.
 
-👨‍🔬 Author
-Dipshant Paudel https://github.com/Dishantpaudel | https://rick-and-morty-react-gray.vercel.app/
+Required repository secrets:
+- `VERCEL_TOKEN`
+- `VERCEL_ORG_ID`
+- `VERCEL_PROJECT_ID`
 
-Created for the Frontend Development Assignment - 2026
+## Author
+Dipshant Paudel

@@ -1,14 +1,13 @@
-name: React CI Pipeline
+name: React CI
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ "main", "master", "develop" ]
   pull_request:
-    branches: [ "main", "master" , "develop" ]
+    branches: ["main"]
 
 jobs:
-  build-and-test:
+  quality-checks:
+    name: Lint, Format and Test
     runs-on: ubuntu-latest
 
     steps:
@@ -18,26 +17,26 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Check Formatting
+      - name: Check formatting
         run: npm run format:check
 
-      - name: Run Linting
+      - name: Run linting
         run: npm run lint
 
-      - name: Run Unit Tests
+      - name: Run component tests
         run: npm run test:unit
 
-      - name: Install Playwright Browser
+      - name: Install Playwright browser
         run: npx playwright install --with-deps chromium
 
-      - name: Run End-to-End Tests
+      - name: Run E2E tests
         run: npm run test:e2e
 
-      - name: Build Application
+      - name: Build application
         run: npm run build

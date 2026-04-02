@@ -28,3 +28,6 @@ dist-ssr
 storybook-static
 playwright-report
 test-results
+
+.vercel
+.env*.local
